@@ -107,9 +107,9 @@ class TokenBucket:
             self._tokens -= 1
             return True
         return False
-
+```
 Async CAN reader interface (mockable)
-
+```python
 from typing import Protocol, AsyncIterator
 
 class AsyncCanSource(Protocol):
@@ -118,16 +118,16 @@ class AsyncCanSource(Protocol):
 
 class AsyncCanSink(Protocol):
     async def write(self, frame: dict) -> None: ...
-
+```
 
 Pytest for a filter
-
+```python
 def test_id_filter_allows_whitelist():
     from traffic_shaper.core.filters import id_whitelist
     f = id_whitelist({0x100, 0x101})
     assert f({"id": 0x100, "data": b"", "ts": 0.0})
     assert not f({"id": 0x123, "data": b"", "ts": 0.0})
-
+```
 
 ## 13) Snippets Copilot should generate
 - Typer command with help, options, and examples.
