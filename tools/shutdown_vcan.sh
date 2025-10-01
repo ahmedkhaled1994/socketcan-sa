@@ -3,9 +3,9 @@ set -euo pipefail
 
 # Remove one or more vcan interfaces (default: all existing vcan*).
 # Usage:
-#   sudo ./tools/teardown_vcan.sh            # remove all vcan interfaces
-#   sudo ./tools/teardown_vcan.sh vcan0      # remove a specific interface
-#   sudo ./tools/teardown_vcan.sh vcan0 vcan1
+#   sudo ./tools/shutdown_vcan.sh            # remove all vcan interfaces
+#   sudo ./tools/shutdown_vcan.sh vcan0      # remove a specific interface
+#   sudo ./tools/shutdown_vcan.sh vcan0 vcan1
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
   echo "Please run as root (use: sudo $0 ...)" >&2
