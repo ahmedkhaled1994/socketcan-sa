@@ -15,7 +15,7 @@ You are GitHub Copilot assisting on a Python project that shapes, analyzes, and 
     - `core/` – shaping rules, filters, schedulers, pipelines
     - `cli.py` – Typer entrypoints
     - `config.py` – Pydantic models & defaults
-    - `logging.py` – logging setup
+    - `log_config.py` – logging setup
     - `version.py` – `__version__`
   - `tests/` – pytest (unit first, integration with `vcan` allowed)
   - `scripts/` – dev helpers (bring up/down `vcan`, lint, fmt)
@@ -29,7 +29,7 @@ You are GitHub Copilot assisting on a Python project that shapes, analyzes, and 
 ## 3) Coding style & quality
 - **Standards**: PEP 8 + type hints (PEP 484). All public funcs/classes documented.
 - **Formatting**: `black` (line length 100) + `isort`.  
-- **Lint**: `ruff` (enable flakes, pycodestyle, pyupgrade). Fix before suggesting cleverness.
+- **Lint**: `ruff` (enable pyflakes, pycodestyle, pyupgrade). Fix before suggesting cleverness.
 - **Docstrings**: Google style.
 - **Types**: Be strict; use `typing` (`Final`, `Literal`, `TypedDict`, `Protocol`) as helpful.
 
@@ -136,7 +136,7 @@ def test_id_filter_allows_whitelist():
 - Tests with mocks and fixture data.
 
 ## 14) Repository conventions
-- Use `pyproject.toml` (poetry or hatch). Expose console script `socketcan-sa` .
+- Use `pyproject.toml` (poetry or hatch). Expose console script `socketcan-sa`.
 - Keep public API under `traffic_shaper/__init__.py`.
 - Re-export stable types and functions; avoid leaking I/O internals.
 
