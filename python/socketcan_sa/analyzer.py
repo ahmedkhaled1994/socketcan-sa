@@ -22,7 +22,10 @@ try:
     from rich.console import Console
 except ImportError:
     print("Tip: Install 'rich' for colored output: pip install rich")
-    Console = lambda: type('Console', (), {'print': print})()
+    class Console:
+        def print(self, *args, **kwargs):
+            print(*args, **kwargs)
+    Console = Console
 
 RECV_TIMEOUT = 0.05     # 50ms timeout for non-blocking receive
 MIN_COUNT_FOR_AVG = 1   # Minimum count to avoid division by zero
@@ -77,7 +80,7 @@ def analyze(iface: str, interval: float = 1.0):
                     for cid in sorted(by_id.keys()):
                         rec = by_id[cid]
                         fps = rec["count"] / dt                           # Frames per second
-                        avg_len = rec["bytes"] / max(MIN_COUNT_FOR_AVG, rec["count"])     # Average payload size
+                        avg_len = rec["bytes"] / rec["count"]     # Average payload size
                         console.print(f"  ID=0x{cid:X}  fps={fps:.2f}  avg_len={avg_len:.1f}B  n={rec['count']}")
 
                 # Clear statistics and start new window
