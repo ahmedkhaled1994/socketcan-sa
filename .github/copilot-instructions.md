@@ -10,7 +10,7 @@ You are GitHub Copilot assisting on a Python project that shapes, analyzes, and 
 
 ## 2) Architecture & layout
 - **Dirs**
-  - `src/socketcan_sa/` – package root (to match your actual project structure)
+  - `src/socketcan_sa/` – package root
     - `io/` – adapters for CAN (python-can), files, PCAP/CSV
     - `core/` – shaping rules, filters, schedulers, pipelines
     - `cli.py` – Typer entrypoints
@@ -123,7 +123,7 @@ class AsyncCanSink(Protocol):
 Pytest for a filter
 ```python
 def test_id_filter_allows_whitelist():
-    from traffic_shaper.core.filters import id_whitelist
+    from socketcan_sa.core.filters import id_whitelist
     f = id_whitelist({0x100, 0x101})
     assert f({"id": 0x100, "data": b"", "ts": 0.0})
     assert not f({"id": 0x123, "data": b"", "ts": 0.0})
@@ -137,7 +137,7 @@ def test_id_filter_allows_whitelist():
 
 ## 14) Repository conventions
 - Use `pyproject.toml` (poetry or hatch). Expose console script `socketcan-sa`.
-- Keep public API under `traffic_shaper/__init__.py`.
+- Keep public API under `socketcan_sa/__init__.py`.
 - Re-export stable types and functions; avoid leaking I/O internals.
 
 ## 15) Commit / PR guidance
@@ -149,3 +149,14 @@ def test_id_filter_allows_whitelist():
 - Use hex format for CAN IDs in logs: `0x{id:X}`
 - Standard vs Extended frame handling
 - DLC validation (0-8 bytes for CAN 2.0)
+
+## 17) Virtual CAN Testing
+- Integration tests should use `vcan0`/`vcan1` interfaces
+- Include `setup_vcan.sh` usage in test documentation
+- Mock CAN interfaces for unit tests, real vcan for integration
+
+## 18) Performance Considerations
+- Target: Handle 1000+ frames/sec on standard hardware
+- Use `uvloop` on Linux for better async performance
+- Profile hot paths in shaping logic
+- Consider batch processing for high-throughput scenarios
