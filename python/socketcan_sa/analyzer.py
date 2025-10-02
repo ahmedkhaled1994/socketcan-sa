@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: 2025 Ahmed Khaled
+
 #!/usr/bin/env python3
 """
 Analyzer for SocketCAN interfaces with bus load and CSV export.
