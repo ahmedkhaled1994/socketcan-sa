@@ -2,10 +2,12 @@
 
 <!-- > Incremental README — we’ll grow this as the project evolves. -->
 
+<!-- > New to CAN? Read the **[CAN basics](docs/can-basics.md)** primer. -->
+
 Minimal toolkit to **analyze** CAN traffic and **shape** (rate-limit/drop/remap) frames.
 Targets Linux **SocketCAN** (e.g., `can0`, `vcan0`). Windows is supported via WSL2 or vendor backends through `python-can`.
 
-- [SocketCAN Traffic Shaper \& Analyzer](#socketcan-traffic-shaper-analyzer)
+- [SocketCAN Traffic Shaper \& Analyzer](#socketcan-traffic-shaper--analyzer)
   - [1) What is SocketCAN?](#1-what-is-socketcan)
   - [2) Project Goals](#2-project-goals)
   - [3) Quick Start](#3-quick-start)
@@ -21,7 +23,7 @@ Targets Linux **SocketCAN** (e.g., `can0`, `vcan0`). Windows is supported via WS
   - [6) Usage (Under Development)](#6-usage-under-development)
   - [7) Development (Under Development)](#7-development-under-development)
     - [7.1 Local setup](#71-local-setup)
-  - [8) Testing \& Benchmarking (Under Development)](#8-testing-benchmarking-under-development)
+  - [8) Testing \& Benchmarking (Under Development)](#8-testing--benchmarking-under-development)
   - [9) Roadmap (living)](#9-roadmap-living)
   - [10) FAQs](#10-faqs)
   - [11) References](#11-references)
