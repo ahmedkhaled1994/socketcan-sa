@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Create and bring up a virtual CAN interface (vcan0).
+# Create and bring up virtual CAN interfaces for testing.
 # Run with: sudo ./tools/setup_vcan.sh
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
   echo "Please run as root (use: sudo $0 ...)" >&2
   exit 1
 fi
+
+echo "Setting up virtual CAN interfaces for testing..."
 
 modprobe vcan 2>/dev/null || true
 
