@@ -24,15 +24,15 @@ import collections
 
 try:
     import can 
-except ImportError as e:
-    raise SystemExit("python-can is required. Install with: pip install python-can") from e
+except ImportError as e:  # pragma: no cover
+    raise SystemExit("python-can is required. Install with: pip install python-can") from e  # pragma: no cover
 
 # Use rich for better output
 try:
     from rich.console import Console
-except ImportError:
-    print("Tip: Install 'rich' for colored output: pip install rich")
-    Console = lambda: type('Console', (), {'print': print})()
+except ImportError:  # pragma: no cover
+    print("Tip: Install 'rich' for colored output: pip install rich")  # pragma: no cover
+    Console = lambda: type('Console', (), {'print': print})()  # pragma: no cover
 
 # Constants
 RECV_TIMEOUT = 0.02     # 20ms timeout for non-blocking receive
@@ -57,7 +57,7 @@ def _frame_bits(payload_len: int) -> int:
     return CAN_FRAME_OVERHEAD_BITS + payload_len * 8
 
 
-def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path: str | None = None):
+def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path: str | None = None, quiet: bool = False, stop_event=None):
     # Connect to the specified SocketCAN interface
     try:
         bus = can.interface.Bus(channel=iface, interface="socketcan")
@@ -87,9 +87,14 @@ def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path:
 
     console = Console()
 
-    print(f"Analyzing interface={iface} (interval={interval:.2f}s). Press Ctrl+C to stop.")
+    if not quiet:
+        print(f"Analyzing interface={iface} (interval={interval:.2f}s). Press Ctrl+C to stop.")
     try:
         while True:
+            # Check if we should stop (for testing)
+            if stop_event and stop_event.is_set():
+                break
+                
             # Receive CAN messages with short timeout to allow periodic reporting
             msg = bus.recv(timeout=RECV_TIMEOUT)
             now = time.time()
@@ -120,10 +125,12 @@ def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path:
                 dt = now - window_start
                 ts = time.strftime("%H:%M:%S", time.localtime(now))
                 bus_load = min(100.0, (bits_in_window / max(dt, 1e-9)) * 100.0 / bitrate)
-                console.print(f"[bold blue][{ts}][/bold blue] window={dt:.2f}s  iface={iface}  bus_load≈{bus_load:.1f}%")
+                if not quiet:
+                    console.print(f"[bold blue][{ts}][/bold blue] window={dt:.2f}s  iface={iface}  bus_load≈{bus_load:.1f}%")
 
                 if not by_id:
-                    console.print("  (no frames in this window)")
+                    if not quiet:
+                        console.print("  (no frames in this window)")
                 else:
                     # Report statistics for each CAN ID seen in this window
                     for cid in sorted(by_id.keys()):
@@ -131,7 +138,8 @@ def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path:
                         fps = rec["count"] / dt                           # Frames per second
                         avg_len = rec["bytes"] / max(MIN_COUNT_FOR_AVG, rec["count"])     # Average payload size
                         avg_jitter = (sum(rec["gaps_ms"]) / len(rec["gaps_ms"])) if rec["gaps_ms"] else 0.0
-                        console.print(f"  ID=0x{cid:X}  fps={fps:.2f}  avg_jitter={avg_jitter:.2f}ms  avg_len={avg_len:.1f}B  n={rec['count']}")
+                        if not quiet:
+                            console.print(f"  ID=0x{cid:X}  fps={fps:.2f}  avg_jitter={avg_jitter:.2f}ms  avg_len={avg_len:.1f}B  n={rec['count']}")
                         if csvw:
                             csvw.writerow([
                                 int(now),
@@ -144,7 +152,8 @@ def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path:
                                 rec["count"],
                             ])
                 
-                console.print("")  # Blank line after each window
+                if not quiet:
+                    console.print("")  # Blank line after each window
                 
                 # Clear statistics and start new window
                 by_id.clear()
@@ -152,7 +161,8 @@ def analyze(iface: str, interval: float = 1.0, bitrate: int = 500_000, csv_path:
                 window_start = now
 
     except KeyboardInterrupt:
-        print("\nStopped.")
+        if not quiet:
+            print("\nStopped.")
     finally:
         # Add proper resource cleanup
         bus.shutdown()

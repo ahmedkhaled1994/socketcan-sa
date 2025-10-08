@@ -3,7 +3,7 @@
 
 #!/usr/bin/env python3
 """
-Step 9 — Pass-through SocketCAN bridge
+Pass-through SocketCAN bridge
 
 Simple bridge that reads CAN frames from an input interface and forwards them 1:1
 to an output interface. This is the foundation for traffic shaping functionality.
@@ -30,14 +30,21 @@ Test setup:
 
 import argparse
 import time
+import threading
+from typing import Final, Optional
 
 try:
-    import can  # pip install python-can
+    import can  
 except ImportError as e:
     raise SystemExit("python-can is required. Install with: pip install python-can") from e
 
+# Configuration constants
+RECV_TIMEOUT: Final[float] = 0.02       # 20ms timeout for non-blocking CAN receive
+SEND_TIMEOUT: Final[float] = 0.1        # 100ms timeout for CAN frame transmission
+DEFAULT_STATS_INTERVAL: Final[float] = 1.0  # Default statistics reporting interval
 
-def run_bridge(if_in: str, if_out: str, stats_interval: float = 1.0, quiet: bool = False):
+
+def run_bridge(if_in: str, if_out: str, stats_interval: float = DEFAULT_STATS_INTERVAL, quiet: bool = False, stop_event: Optional[threading.Event] = None):
     """
     Run a pass-through CAN bridge between two SocketCAN interfaces.
     
@@ -59,10 +66,9 @@ def run_bridge(if_in: str, if_out: str, stats_interval: float = 1.0, quiet: bool
         This function blocks until interrupted. Use Ctrl+C to stop bridging.
     """
     # Open input and output CAN interfaces
-    # Using 'bustype' parameter (will be updated to 'interface' in future)
     try:
-        in_bus = can.interface.Bus(channel=if_in, bustype="socketcan")
-        out_bus = can.interface.Bus(channel=if_out, bustype="socketcan")
+        in_bus = can.interface.Bus(channel=if_in, interface="socketcan")
+        out_bus = can.interface.Bus(channel=if_out, interface="socketcan")
     except Exception as e:
         raise SystemExit(f"Failed to open CAN interfaces: {e}") from e
 
@@ -75,9 +81,13 @@ def run_bridge(if_in: str, if_out: str, stats_interval: float = 1.0, quiet: bool
     
     try:
         while True:
+            # Check if we should stop (for testing)
+            if stop_event and stop_event.is_set():
+                break
+                
             # Receive frames with short timeout for responsiveness
-            # Small timeout (20ms) keeps the loop responsive to Ctrl+C and stats printing
-            msg = in_bus.recv(timeout=0.02)
+            # Small timeout keeps the loop responsive to Ctrl+C and stats printing
+            msg = in_bus.recv(timeout=RECV_TIMEOUT)
             now = time.time()
 
             # Process received frame if available
@@ -98,7 +108,7 @@ def run_bridge(if_in: str, if_out: str, stats_interval: float = 1.0, quiet: bool
                 
                 # Forward frame to output interface with timeout
                 try:
-                    out_bus.send(fwd, timeout=0.1)  # 100ms send timeout
+                    out_bus.send(fwd, timeout=SEND_TIMEOUT)
                     tx += 1
                 except can.CanError:
                     # Count send errors but continue processing
@@ -139,7 +149,7 @@ def main():
     ap = argparse.ArgumentParser(
         description="Pass-through SocketCAN bridge (Step 9)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=""":
+        epilog="""
 Examples:
   %(prog)s --if-in vcan0 --if-out vcan1
   %(prog)s --if-in can0 --if-out can1 --stats-interval 5.0 --quiet
@@ -168,8 +178,8 @@ Testing:
     ap.add_argument(
         "--stats-interval", 
         type=float, 
-        default=1.0, 
-        help="Seconds between statistics reports (default: 1.0)"
+        default=DEFAULT_STATS_INTERVAL, 
+        help=f"Seconds between statistics reports (default: {DEFAULT_STATS_INTERVAL})"
     )
     ap.add_argument(
         "--quiet", 
@@ -185,13 +195,7 @@ Testing:
         ap.error("Stats interval must be positive")
     
     # Start the bridge with parsed arguments
-    # Handle both dict and namespace argument formats for flexibility
-    run_bridge(
-        args["if_in"] if isinstance(args, dict) else args.if_in,
-        args["if_out"] if isinstance(args, dict) else args.if_out,
-        args.stats_interval, 
-        args.quiet
-    )
+    run_bridge(args.if_in, args.if_out, args.stats_interval, args.quiet)
 
 
 if __name__ == "__main__":
