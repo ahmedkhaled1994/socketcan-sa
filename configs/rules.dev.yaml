@@ -1,0 +1,9 @@
+limits:
+  "0x18FF50E5": { rate: 50, burst: 25 }
+  "0x7DF":      { rate: 10 }           # burst defaults to ceil(rate)
+
+actions:
+  drop:
+    - "0x123"
+  remap:
+    - { from: "0x456", to: "0x457" }

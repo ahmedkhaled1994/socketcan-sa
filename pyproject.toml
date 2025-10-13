@@ -15,6 +15,7 @@ dependencies = [
     "typer>=0.9.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",
+    "PyYAML>=6.0"
 ]
 
 [project.optional-dependencies]
@@ -59,12 +60,6 @@ src_paths = ["src/socketcan_sa", "tests"]
 line-length = 100
 target-version = "py312"
 src = ["src/socketcan_sa", "tests"]
-
-[tool.poetry.dependencies]
-hypothesis = "^6.0"
-
-[tool.poetry.group.dev.dependencies]
-hypothesis = "^6.0"
 
 [tool.coverage.run]
 source = ["src/socketcan_sa"]

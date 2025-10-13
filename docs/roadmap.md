@@ -48,7 +48,7 @@ _Last updated: 2025-10-02 (America/Vancouver)_
 ---
 
 ## D) Shaper MVP (Bridge & Rules)
-- [ ] **Step 9 (NEXT):** Pass-through bridge  
+- [x] **Step 9 (NEXT):** Pass-through bridge  
   Open `--if-in vcan0`, `--if-out vcan1`; forward all frames; counters for rx/tx/errors.  
   **Test:** `cangen vcan0 …` → `candump vcan1` shows identical frames.
 
