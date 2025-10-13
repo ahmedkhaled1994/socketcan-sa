@@ -138,6 +138,8 @@ celerybeat.pid
 .env
 .envrc
 .venv
+.venv-wsl
+.venv_old
 env/
 venv/
 ENV/
@@ -205,3 +207,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+#csv-output
+*.csv

@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "socketcan-sa"
+version = "0.1.0"
+description = "SocketCAN Traffic Shaper & Analyzer"
+authors = [{name = "Ahmed Khaled"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "python-can>=4.0.0",
+    "typer>=0.9.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "PyYAML>=6.0"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "hypothesis>=6.0.0",
+    "psutil>=5.9.0",
+]
+dev = [
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "ruff>=0.0.270",
+]
+
+[project.scripts]
+socketcan-sa = "socketcan_sa.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short --timeout=30"
+timeout = 30
+
+[tool.black]
+line-length = 100
+target-version = ['py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+src_paths = ["src/socketcan_sa", "tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src/socketcan_sa", "tests"]
+
+[tool.coverage.run]
+source = ["src/socketcan_sa"]
+omit = [
+    "tests/*",
+    "*/conftest.py",
+    "*/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "except ImportError",
+    "raise SystemExit.*ImportError",
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
