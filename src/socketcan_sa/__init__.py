@@ -7,7 +7,18 @@ A Python package for shaping, analyzing, and replaying SocketCAN traffic.
 __version__ = "0.1.0"
 
 # Import main modules for easier access
-from . import shaper
 from . import analyzer
+from . import rules  
+from . import shaper
 
-__all__ = ["shaper", "analyzer"]
+# Export key public functions per Copilot guidelines
+from .analyzer import analyze
+from .rules import load_rules, RuleError
+from .shaper import run_bridge
+
+__all__ = [
+    # Modules
+    "analyzer", "rules", "shaper",
+    # Key functions and classes
+    "analyze", "load_rules", "RuleError", "run_bridge"
+]
